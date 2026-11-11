@@ -3,9 +3,10 @@
 
 Writes one picture of a cat to /output/entry.png.
 
-The entry image is a picture this repository holds (cat.png): a fluffy
-orange tabby kitten with huge amber eyes, head tilted, looking straight
-at the camera. The program only copies those exact bytes to the output
+The entry image is a picture this repository holds (cat.png): an extreme
+close-up of a fluffy orange tabby kitten's face filling the frame, with
+enormous round amber eyes, a tiny pink nose and whiskers, on a soft cream
+bokeh background. The program only copies those exact bytes to the output
 path, so both runs write identical bytes and no network is used.
 """
 
@@ -33,7 +34,10 @@ def main() -> int:
     os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
     shutil.copyfile(SOURCE, OUTPUT)
     width, height = png_size(OUTPUT)
-    print(f"Wrote {OUTPUT} ({os.path.getsize(OUTPUT)} bytes, {width}x{height})")
+    size = os.path.getsize(OUTPUT)
+    if size > 1048576:
+        raise ValueError(f"output over 1 MiB: {size} bytes")
+    print(f"Wrote {OUTPUT} ({size} bytes, {width}x{height})")
     return 0
 
 
