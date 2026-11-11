@@ -11,6 +11,7 @@ path, so both runs write identical bytes and no network is used.
 
 import os
 import shutil
+import struct
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -18,10 +19,21 @@ SOURCE = os.path.join(HERE, "cat.png")
 OUTPUT = "/output/entry.png"
 
 
+def png_size(path):
+    """Return (width, height) of a PNG file, from its IHDR chunk."""
+    with open(path, "rb") as f:
+        header = f.read(33)
+    if header[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError("not a PNG file")
+    width, height = struct.unpack(">II", header[16:24])
+    return width, height
+
+
 def main() -> int:
     os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
     shutil.copyfile(SOURCE, OUTPUT)
-    print(f"Wrote {OUTPUT} ({os.path.getsize(OUTPUT)} bytes)")
+    width, height = png_size(OUTPUT)
+    print(f"Wrote {OUTPUT} ({os.path.getsize(OUTPUT)} bytes, {width}x{height})")
     return 0
 
 
